@@ -63,6 +63,7 @@ int send_header(int sockfd, char *header_str) {
 char *header_create(char *method, char *uri) {
     int len;
     char *header_str;
+
     //       Method Uri HTTP/1.1\r\n\0  
     len = strlen(method) + 1 + strlen(uri) + 1 + 8 + 2 + 1 + 2;  //+2是为了预留空间给结尾的空行\r\n
     header_str = (char *)malloc(sizeof(char) * len);
@@ -77,6 +78,7 @@ char *header_set(char **pheader_str, char *key, char *value) {
     int old_len;
     char *new_header;
     old_len = strlen(*pheader_str);
+
     new_header = (char *)realloc(*pheader_str, sizeof(char) * (old_len + strlen(key) + 2 + strlen(value) + 3 + 2));//+2是为了预留空间给结尾的空行\r\n
     if (new_header == NULL) {
         return NULL;
@@ -88,6 +90,7 @@ char *header_set(char **pheader_str, char *key, char *value) {
     
 char *header_finish(char *header_str) {
     int old_len;
+
     old_len = strlen(header_str);
     header_str[old_len ++] = '\r';
     header_str[old_len ++] = '\n'; 
@@ -102,14 +105,13 @@ char *header_finish(char *header_str) {
 
 int recv_resp(int sockfd, char *buf, int size) {
     int res;
+
     res = recv(sockfd, buf, size, MSG_WAITALL);
     return res;
 }
 
 char *parse_header(char *buf, int size, struct header *resp) {
-    
-    char *pos = buf;
-    
+    char *pos = buf; 
     char *pos2;
     int tmp = 0; 
     int len;
@@ -181,6 +183,8 @@ int parse_url(char *url, struct url *aurl) {
     char *pos2, *pos3;
     char *host;
     int n;
+
+    //去除开头的http://
     if (strncasecmp(pos, "http://", 7) == 0) {
         pos += 7;
     }

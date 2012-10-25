@@ -30,7 +30,9 @@ void cookies_set(struct cookies *cookies, char *set_cookie) {
     int val_len;
     char name[MAX_COOKIE_NAME_LEN] = {0};  
     struct cookie *cookie;
+    
     n = countChr(set_cookie, ';') + 1; 
+
     for (i = 0; i < n; i ++) { 
         pos2 = strchr(pos, '=');
         name_len = pos2 - pos;
@@ -44,6 +46,7 @@ void cookies_set(struct cookies *cookies, char *set_cookie) {
         while (cookie != NULL) {
             strncpy(name, pos, name_len);
             name[name_len] = '\0';
+            //查看是否已有此项
             if (strcmp(cookie->name, name) == 0) {   //存在则修改
                 strncpy(cookie->value, pos2 + 1, val_len);
                 cookie->value[val_len] = '\0';
@@ -84,6 +87,7 @@ static int countChr(char *str, unsigned char c) {
 }
 
 
+//将cookies结构体中的cookie转化为字符串，以供发送
 
 void cookies_get(struct cookies *cookies, char *buf) {
     struct cookie *cookie;

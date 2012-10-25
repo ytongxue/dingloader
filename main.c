@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
     memset(&cookies, 0, sizeof(struct cookies));
     int index = 1;
     char c;
+    
     if (argc < 2) {
         printf("Wrong Usage!\n\n");
         usage(argv[0]);
@@ -89,7 +90,6 @@ int download(char *url, char *saveto) {
     char *pchr;
     char cookie_str[MAX_COOKIE_LEN];
     
-
 
     debugp("URL : %s\n", url);
     parse_url(url, &aurl);
@@ -184,12 +184,12 @@ int download(char *url, char *saveto) {
     }
 
     printf("\n");
+
+    //清理
     fclose(fp); 
     close(sockfd);
     free(header);
-    free(aurl.host);
-    free(aurl.uri);
-    free(aurl.dir);
-    free(aurl.filename); 
+    free_header(&resp);
+    free_url(&aurl);
     return size;
 }
