@@ -96,7 +96,42 @@ int download(char *url, char *saveto) {
 
     sockfd = make_connection(aurl.host, 80);
 
-    //设置请求头 
+#ifdef DEBUG  //request for the header only
+    if(strlen(aurl.filename) == 0) {
+        debugp("Starting to configure the request header...\n");
+        request_header_str = header_create("HEAD", aurl.uri);
+        header_set(&request_header_str, "Accept", "*/*");
+        header_set(&request_header_str, "Connection", "close");
+        header_set(&request_header_str, "Host", aurl.host);
+        header_set(&request_header_str, "Cache-Control", "max-age=0");
+        header_finish(request_header_str);
+
+        debugp("Starting to send the request header...\n"); 
+        send_header(sockfd, request_header_str); 
+        header_len = recv_resp(sockfd, buf, sizeof(buf));
+        buf[header_len] = 0;
+        printf("Header:\n%s\n\n\n", buf);
+        parse_header(buf, header_len, &resp);
+        if (resp.content_disposition) {
+            if (strncmp(resp.content_disposition, "attachment", 10) == 0) {
+                pchr = strchr(resp.content_disposition, '='); 
+                if (pchr) {
+                    saveto = malloc(strlen(pchr) * sizeof(char));
+                    strcpy(saveto, pchr + 1);
+                }
+            }
+        }
+        free(request_header_str);
+        free_header(&resp);
+    } else {
+        saveto = aurl.filename;
+    }
+#endif
+
+
+
+
+//设置请求头 
     debugp("Starting to configure the request header...\n");
     request_header_str = header_create("GET", aurl.uri);
     header_set(&request_header_str, "Accept", "*/*");
@@ -114,11 +149,19 @@ int download(char *url, char *saveto) {
 
     debugp("Starting to send the request header...\n"); 
     send_header(sockfd, request_header_str); 
-    saveto = aurl.filename;
+    //saveto = aurl.filename;
 
     fp = fopen(saveto, "w");
+    if (fp == NULL) {
+        printf("Cannot open file %s.\n", saveto);
+        return -1;
+    }
     gettimeofday(&tv1, NULL);
     response_size = recv_resp(sockfd, buf, sizeof(buf));
+    if (respone_size < 0) {
+        printf("Error!");
+        return -1;
+    }
     gettimeofday(&tv2, NULL);
     usec = (tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec);
     content = parse_header(buf, strlen(buf), &resp); 

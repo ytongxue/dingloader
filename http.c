@@ -133,12 +133,14 @@ char *parse_header(char *buf, int size, struct header *resp) {
         } else { 
             pos2 = strchr(pos, ':'); 
             len = pos2 - pos + 1;
-            if (strncmp(pos, "Content-Length", 14) == 0) { 
+            if (strncasecmp(pos, "Content-Length", 14) == 0) { 
                 ppchr = &(resp->content_length);
-            } else if (strncmp(pos, "Location", 8) == 0) { 
+            } else if (strncasecmp(pos, "Location", 8) == 0) { 
                 ppchr = &(resp->location);
-            } else if (strncmp(pos, "Set-Cookie", 10) == 0) {
+            } else if (strncasecmp(pos, "Set-Cookie", 10) == 0) {
                 ppchr = &(resp->set_cookie);
+            } else if (strncasecmp(pos, "Content-Disposition", 19) == 0){
+                ppchr = &(resp->content_disposition);  
             } else {
                 ppchr = NULL;
             }

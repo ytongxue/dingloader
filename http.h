@@ -28,6 +28,7 @@ struct header {
     char *content_length;
     char *location;
     char *set_cookie;
+    char *content_disposition;
 };
 
 void free_url(struct url *url);
