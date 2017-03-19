@@ -94,26 +94,31 @@ int download(char *url, char *saveto) {
     debugp("URL : %s\n", url);
     parse_url(url, &aurl);
 
+    debugp("host: %s\n", aurl.host);
     sockfd = make_connection(aurl.host, 80);
     if (sockfd < 0) {
         return -1;
     }
 
 #ifdef DEBUG  //request for the header only
-    if(strlen(aurl.filename) == 0) {
+    if(aurl.filename == NULL || strlen(aurl.filename) == 0) {
         debugp("Starting to configure the request header...\n");
         request_header_str = header_create("HEAD", aurl.uri);
         header_set(&request_header_str, "Accept", "*/*");
-        header_set(&request_header_str, "Connection", "close");
+        //header_set(&request_header_str, "Connection", "close");
+        header_set(&request_header_str, "Connection", "keep-alive");
         header_set(&request_header_str, "Host", aurl.host);
         header_set(&request_header_str, "Cache-Control", "max-age=0");
         header_finish(request_header_str);
+
+        debugp("request_header_str: \"%s\"\n", request_header_str);
 
         debugp("Starting to send the request header...\n"); 
         send_header(sockfd, request_header_str); 
         header_len = recv_resp(sockfd, buf, sizeof(buf));
         buf[header_len] = 0;
-        printf("Header:\n%s\n\n\n", buf);
+        printf("responsed header length: %d\n", header_len);
+        printf("responsed Header content:\n\"%s\"\n\n\n", buf);
         parse_header(buf, header_len, &resp);
         if (resp.content_disposition) {
             if (strncmp(resp.content_disposition, "attachment", 10) == 0) {
@@ -126,6 +131,7 @@ int download(char *url, char *saveto) {
         }
         free(request_header_str);
         free_header(&resp);
+        return 0;
     } else {
         saveto = aurl.filename;
     }

@@ -1,4 +1,9 @@
 #include "http.h"
+#include <string.h>
+#include <strings.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
 
 void free_url(struct url* url) {
     free(url->full_url);
@@ -128,48 +133,53 @@ char *parse_header(char *buf, int size, struct header *resp) {
         pos ++;
     }
     resp->status = tmp;
-    pos = strchr(pos, '\n') + 1;
-    while(strncmp(pos, "\r\n", 2) != 0) {
-        if (pos == NULL || pos == buf + size) {
-            return NULL;
-        } else { 
-            pos2 = strchr(pos, ':'); 
-            len = pos2 - pos + 1;
-            if (strncasecmp(pos, "Content-Length", 14) == 0) { 
-                ppchr = &(resp->content_length);
-            } else if (strncasecmp(pos, "Location", 8) == 0) { 
-                ppchr = &(resp->location);
-            } else if (strncasecmp(pos, "Set-Cookie", 10) == 0) {
-                ppchr = &(resp->set_cookie);
-            } else if (strncasecmp(pos, "Content-Disposition", 19) == 0){
-                ppchr = &(resp->content_disposition);  
+    char *posFirstNewline = strchr(pos, '\n');
+    if (posFirstNewline) {
+        pos = posFirstNewline + 1;
+        while (pos != NULL && strncmp(pos, "\r\n", 2) != 0) {
+            if (pos == NULL || pos == buf + size) {
+                return NULL;
             } else {
-                ppchr = NULL;
-            }
-            pos = pos2 + 1;
-            while ( (*pos) == ' ') { 
-                pos ++;
-            }
-            pos2 = strchr(pos, '\r'); 
-            len = pos2 - pos + 1;
-            if (ppchr != NULL) {
-                if (*ppchr != NULL) { //已有
-                    tmp = strlen(*ppchr);
-                    *ppchr = (char *)realloc(*ppchr, sizeof(char) * (tmp + len + 2));
-                    pchr = *ppchr + tmp;
-                    *(pchr ++) = ';'; 
-                    *(pchr ++) = ' ';
+                pos2 = strchr(pos, ':');
+                len = pos2 - pos + 1;
+                if (strncasecmp(pos, "Content-Length", 14) == 0) {
+                    ppchr = &(resp->content_length);
+                } else if (strncasecmp(pos, "Location", 8) == 0) {
+                    ppchr = &(resp->location);
+                } else if (strncasecmp(pos, "Set-Cookie", 10) == 0) {
+                    ppchr = &(resp->set_cookie);
+                } else if (strncasecmp(pos, "Content-Disposition", 19) == 0) {
+                    ppchr = &(resp->content_disposition);
                 } else {
-                    *ppchr = (char *)malloc(sizeof(char) * len);
-                    pchr = *ppchr;
+                    ppchr = NULL;
                 }
-                strncpy(pchr, pos, len);
-                pchr[len - 1] = 0;
-            } 
-            pos = pos2 + 2; 
-        }   
+                pos = pos2 + 1;
+                while ( (*pos) == ' ') {
+                    pos ++;
+                }
+                pos2 = strchr(pos, '\r');
+                len = pos2 - pos + 1;
+                if (ppchr != NULL) {
+                    if (*ppchr != NULL) { //已有
+                        tmp = strlen(*ppchr);
+                        *ppchr = (char *)realloc(*ppchr, sizeof(char) * (tmp + len + 2));
+                        pchr = *ppchr + tmp;
+                        *(pchr ++) = ';';
+                        *(pchr ++) = ' ';
+                    } else {
+                        *ppchr = (char *)malloc(sizeof(char) * len);
+                        pchr = *ppchr;
+                    }
+                    strncpy(pchr, pos, len);
+                    pchr[len - 1] = 0;
+                }
+                pos = pos2 + 2;
+            }
+        }
+        return pos + 2;
+    } else {
+        return "";
     }
-    return pos + 2; 
 }
 
 #ifdef DEBUG
@@ -188,6 +198,8 @@ int parse_url(char *url, struct url *aurl) {
     char *host;
     int n;
 
+    bzero(aurl, sizeof(struct url));
+
     //去除开头的http://
     if (strncasecmp(pos, "http://", 7) == 0) {
         pos += 7;
@@ -195,7 +207,9 @@ int parse_url(char *url, struct url *aurl) {
 
     //host
     pos2 = strchr(pos, '/');
-    if (!pos2) return -1;
+    if (!pos2) {
+        pos2 = pos + strlen(pos); // point to the end
+    }
     n = pos2 - pos;
     host = (char *)malloc(sizeof(char) * (n + 1));
     strncpy(host, pos, n);
@@ -207,9 +221,16 @@ int parse_url(char *url, struct url *aurl) {
     n = strlen(pos) + 1;
     aurl->uri = (char *)malloc(sizeof(char) * n);
     strcpy(aurl->uri, pos);
+    if (n == 1) {
+        return 0;
+    }
 
     //filename
-    pos2 = strrchr(pos, '/') + 1;
+    char *posLastSlash = strrchr(pos, '/');
+    if (posLastSlash == NULL) {
+        //TODO: do something
+    }
+    pos2 = posLastSlash + 1;
     pos3 = strchr(pos2, '?');
     if (pos3 == NULL) {
         pos3 = strrchr(pos2, 0);

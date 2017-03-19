@@ -1,4 +1,6 @@
 #include "cookie.h"
+#include <strings.h>
+#include <ctype.h>
 
 static int countChr(char *str, unsigned char c);
 
@@ -33,9 +35,18 @@ void cookies_set(struct cookies *cookies, char *set_cookie) {
     
     n = countChr(set_cookie, ';') + 1; 
 
-    for (i = 0; i < n; i ++) { 
+    for (i = 0; i < n; i ++) {
         pos2 = strchr(pos, '=');
+        if (pos2 == NULL) {
+            //debugp("[%s:%d] what the fuck??\n", __FUNCTION__, __LINE__);
+            //debugp("set_cookie: \"%s\"\n", set_cookie);
+            break;
+        }
         name_len = pos2 - pos;
+        if (name_len < 0) {
+            debugp("[%s:%d] what the fuck??\n", __FUNCTION__, __LINE__);
+            break;
+        }
         pos3 = strchr(pos, ';'); 
         if (pos3 == NULL) {
             pos3 = strchr(set_cookie, '\0');

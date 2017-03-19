@@ -42,6 +42,7 @@ int send_header(int sockfd, char *header_str);
 int recv_resp(int sockfd, char *buf, int size);
 
 
+int parse_url(char *url, struct url *aurl);
 
 char *parse_header(char *buf, int size, struct header *resp);
 

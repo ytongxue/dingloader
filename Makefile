@@ -1,7 +1,16 @@
 CC := gcc
-CFLAGS := -g
+CFLAGS := -g -std=c99
 obj = main.o http.o bitmap.o cookie.o
-main : $(obj)
+ifneq ($(MAKECMDGOALS), tester)
+target := dingloader
+else
+target := tester
+obj := $(filter-out main.o,$(obj))
+obj += tester.o
+endif
+
+$(target) : $(obj)
+	#echo $(obj)
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(obj) : %.o : %.c
@@ -12,5 +21,5 @@ run :
 
 clean:
 	@-rm *.o
-	@-rm main
+	@-rm $(target)
 	@echo Done.
