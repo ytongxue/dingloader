@@ -15,12 +15,14 @@ void free_header(struct header *header) {
 }
 /*与hostname:port主机建立连接，返回sockfd*/
 int make_connection(char *hostname, int port) {
+    if (hostname == NULL) return -1;
     int sockfd;
     struct hostent *hostentry;
     struct sockaddr_in hostaddr;
     char str[100];
 
     debugp("Start to get host addr...\n");
+    //debugp("hostname: %s\n", hostname);
     hostentry = gethostbyname(hostname);
     if (hostentry == NULL) {
         printf("!!!gethostbyname Error!\n");

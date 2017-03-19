@@ -95,6 +95,9 @@ int download(char *url, char *saveto) {
     parse_url(url, &aurl);
 
     sockfd = make_connection(aurl.host, 80);
+    if (sockfd < 0) {
+        return -1;
+    }
 
 #ifdef DEBUG  //request for the header only
     if(strlen(aurl.filename) == 0) {
