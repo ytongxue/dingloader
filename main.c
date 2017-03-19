@@ -158,7 +158,7 @@ int download(char *url, char *saveto) {
     }
     gettimeofday(&tv1, NULL);
     response_size = recv_resp(sockfd, buf, sizeof(buf));
-    if (respone_size < 0) {
+    if (response_size < 0) {
         printf("Error!");
         return -1;
     }
