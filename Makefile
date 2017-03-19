@@ -1,11 +1,11 @@
 CC := gcc
 CFLAGS := -g -std=c99
-obj = main.o http.o bitmap.o cookie.o
+obj = http.o bitmap.o cookie.o
 ifneq ($(MAKECMDGOALS), tester)
 target := dingloader
+obj += main.o
 else
 target := tester
-obj := $(filter-out main.o,$(obj))
 obj += tester.o
 endif
 
