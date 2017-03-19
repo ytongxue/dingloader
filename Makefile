@@ -1,25 +1,31 @@
 CC := gcc
 CFLAGS := -g -std=c99
-obj = http.o bitmap.o cookie.o
+src := http.c bitmap.c cookie.c
+src_dir := src/
+obj_dir := obj/
 ifneq ($(MAKECMDGOALS), tester)
 target := dingloader
-obj += main.o
+src += main.c
 else
 target := tester
-obj += tester.o
+src += tester.c
 endif
 
+obj := $(addprefix $(obj_dir),$(patsubst %.c, %.o, $(src)))
+VPATH := src
+
 $(target) : $(obj)
-	#echo $(obj)
 	$(CC) $(CFLAGS) -o $@ $^
 
-$(obj) : %.o : %.c
+$(obj) : obj/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
 run :
-	./main
+	./$(target)
 
 clean:
-	@-rm *.o
-	@-rm $(target)
+	@-rm $(obj_dir)/*.o
+	@-rm dingloader
+	@-rm tester
 	@echo Done.
+
