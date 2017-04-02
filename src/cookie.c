@@ -76,7 +76,7 @@ void cookies_set(struct cookies *cookies, char *set_cookie) {
         }
 jumpout:   //terrible idea
         pos = pos3 + 1; 
-        while (isblank(*pos)) {
+        while (*pos != '\0' && isblank(*pos)) {
             pos ++;
         }
     }
@@ -102,10 +102,12 @@ static int countChr(char *str, unsigned char c) {
 
 void cookies_get(struct cookies *cookies, char *buf) {
     struct cookie *cookie;
+    char tmp[128] = "";
     cookie = cookies->cookie_list;
     buf[0] = 0;
     while (cookie != NULL) {
-        sprintf(buf, "%s=%s; %s", cookie->name, cookie->value, buf);
+        sprintf(tmp, "%s=%s; ", cookie->name, cookie->value);
+        strcat(buf, tmp);
         cookie = cookie->next;
     }
     buf[strlen(buf) - 2] = '\0';
