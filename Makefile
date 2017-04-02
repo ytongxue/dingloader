@@ -21,7 +21,7 @@ $(obj) : obj/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
 run :
-	./$(target)
+	./$(target) "http://hnd-jp-ping.vultr.com/vultr.com.1000MB.bin"
 
 clean:
 	@-rm $(obj_dir)/*.o

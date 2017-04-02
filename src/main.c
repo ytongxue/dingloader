@@ -85,7 +85,7 @@ int download(char *url, char *saveto) {
     int header_len;
     struct url_info_s aurl;
     struct timeval tv1, tv2;
-    long double usec;
+    unsigned long long usec;
     long double speed;  //TODO: 下载速度完全不对,请修正
     char *pchr;
     char cookie_str[MAX_COOKIE_LEN];
@@ -224,11 +224,13 @@ int download(char *url, char *saveto) {
     printf("\nDownloading %ld/%ld\t\t%.2LfkB/s", downloaded, size, speed);
 
     gettimeofday(&tv1, NULL);
-    while((response_size = recv_resp(sockfd, buf, sizeof(buf))) > 0) {
+    while ((response_size = recv_resp(sockfd, buf, sizeof(buf))) > 0) {
         gettimeofday(&tv2, NULL);
-        usec = (tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec);
+        usec = (tv2.tv_sec - tv1.tv_sec) * 1000 * 1000 + (tv2.tv_usec - tv1.tv_usec);
         downloaded += response_size;
-        speed = (long double)response_size * 1000 / usec ;
+        if (usec > 0) {
+            speed = (long double)response_size * 1000 / usec ;
+        }
         printf( "\rDownloading %ld/%ld\t\t%.2LfkB/s       ", downloaded, size, speed);
         fflush(stdout);
         fwrite(buf, response_size, sizeof(char), fp); 
