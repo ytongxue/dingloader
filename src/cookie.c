@@ -102,7 +102,7 @@ static int countChr(char *str, unsigned char c) {
 
 void cookies_get(struct cookies *cookies, char *buf) {
     struct cookie *cookie;
-    char tmp[128] = "";
+    char tmp[MAX_COOKIE_NAME_LEN + MAX_COOKIE_VAL_LEN + 3] = "";
     cookie = cookies->cookie_list;
     buf[0] = 0;
     while (cookie != NULL) {
