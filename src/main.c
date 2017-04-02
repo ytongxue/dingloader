@@ -224,12 +224,17 @@ int download(char *url, char *saveto) {
     printf("\nDownloading %ld/%ld\t\t%.2LfkB/s", downloaded, size, speed);
 
     gettimeofday(&tv1, NULL);
+    usec = 0;
+    unsigned long long downloaded_size_in_1_sec = 0;
     while ((response_size = recv_resp(sockfd, buf, sizeof(buf))) > 0) {
         gettimeofday(&tv2, NULL);
-        usec = (tv2.tv_sec - tv1.tv_sec) * 1000 * 1000 + (tv2.tv_usec - tv1.tv_usec);
+        usec += (tv2.tv_sec - tv1.tv_sec) * 1000 * 1000 + (tv2.tv_usec - tv1.tv_usec);
         downloaded += response_size;
-        if (usec > 0) {
-            speed = (long double)response_size * 1000 / usec ;
+        downloaded_size_in_1_sec += response_size;
+        if (usec > 1000 * 1000) {
+            speed = (long double)downloaded_size_in_1_sec * 1000 / usec ;
+            usec = 0;
+            downloaded_size_in_1_sec = 0;
         }
         printf( "\rDownloading %ld/%ld\t\t%.2LfkB/s       ", downloaded, size, speed);
         fflush(stdout);
