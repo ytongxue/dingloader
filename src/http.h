@@ -15,7 +15,8 @@
 #define HTTP_ACCEPT "*/*"
 #define CACHE_CONTROL "Cache-Control:max-age=0"
 #define CONNECTION ""//"Connection:keep-alive"
-struct url {
+
+struct url_info_s {
     char *full_url; //完整url
     char *host; //主机名
     char *uri;
@@ -31,7 +32,7 @@ struct header {
     char *content_disposition;
 };
 
-void free_url(struct url *url);
+void free_url(struct url_info_s *url);
 
 void free_header(struct header *header);
 
@@ -42,7 +43,7 @@ int send_header(int sockfd, char *header_str);
 int recv_resp(int sockfd, char *buf, int size);
 
 
-int parse_url(char *url, struct url *aurl);
+int parse_url(char *url, struct url_info_s *aurl);
 
 char *parse_header(char *buf, int size, struct header *resp);
 

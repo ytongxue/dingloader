@@ -83,7 +83,7 @@ int download(char *url, char *saveto) {
     char *content;
     struct header resp;
     int header_len;
-    struct url aurl;
+    struct url_info_s aurl;
     struct timeval tv1, tv2;
     long double usec;
     long double speed;  //TODO: 下载速度完全不对,请修正

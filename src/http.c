@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <arpa/inet.h>
 
-void free_url(struct url* url) {
+void free_url(struct url_info_s* url) {
     free(url->full_url);
     free(url->host);
     free(url->uri);
@@ -192,13 +192,13 @@ void header_print(struct header *resp) {
 #endif
 
 
-int parse_url(char *url, struct url *aurl) {
-    char *pos = url;
+int parse_url(char *cp_url, struct url_info_s *aurl) {
+    char *pos = cp_url;
     char *pos2, *pos3;
     char *host;
     int n;
 
-    bzero(aurl, sizeof(struct url));
+    bzero(aurl, sizeof(struct url_info_s));
 
     //去除开头的http://
     if (strncasecmp(pos, "http://", 7) == 0) {
