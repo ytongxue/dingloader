@@ -88,7 +88,6 @@ int bitmap_clrbit(FILE *fp, unsigned long pos) {
     fseek(fp, byte_pos, SEEK_SET);  
 
     return fputc(byte, fp);//and write the byte back 
-return 0;
 }
 
 
