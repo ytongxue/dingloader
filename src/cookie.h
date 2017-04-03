@@ -19,7 +19,7 @@ struct cookie {
     struct cookie *next;
 };
 
-struct cookies {
+struct cookie_jar_s {
     char *host;
     char *path;
     char *domain;
@@ -28,13 +28,13 @@ struct cookies {
 };
 
 #ifdef DEBUG
-void free_cookie(struct cookies *cookies);
+void free_cookie(struct cookie_jar_s *cookies);
 #endif
 
-void cookies_set(struct cookies *cookies, char *set_cookie);
+void cookies_set(struct cookie_jar_s *cookies, char *set_cookie);
 
-void cookies_get(struct cookies *cookies, char *buf);
+void cookies_get(struct cookie_jar_s *cookies, char *buf);
 
-void cookies_print(struct cookies *cookies); 
+void cookies_print(struct cookie_jar_s *cookies);
 
 #endif

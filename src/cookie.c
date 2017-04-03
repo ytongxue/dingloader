@@ -6,7 +6,7 @@ static int countChr(char *str, unsigned char c);
 
 
 
-void free_cookies(struct cookies *cookies) { 
+void free_cookies(struct cookie_jar_s *cookies) {
     struct cookie *tmp, *tmp2;
 
     free(cookies->host);
@@ -22,7 +22,7 @@ void free_cookies(struct cookies *cookies) {
 }
 
 
-void cookies_set(struct cookies *cookies, char *set_cookie) {
+void cookies_set(struct cookie_jar_s *cookies, char *set_cookie) {
     char *pos = set_cookie;
     char *pos2, *pos3;
     char c;
@@ -100,7 +100,7 @@ static int countChr(char *str, unsigned char c) {
 
 //将cookies结构体中的cookie转化为字符串，以供发送
 
-void cookies_get(struct cookies *cookies, char *buf) {
+void cookies_get(struct cookie_jar_s *cookies, char *buf) {
     struct cookie *cookie;
     char tmp[MAX_COOKIE_NAME_LEN + MAX_COOKIE_VAL_LEN + 3] = "";
     cookie = cookies->cookie_list;
@@ -115,7 +115,7 @@ void cookies_get(struct cookies *cookies, char *buf) {
 
 
 #ifdef DEBUG
-void cookies_print(struct cookies *cookies) {
+void cookies_print(struct cookie_jar_s *cookies) {
     struct cookie *cookie;
     cookie = cookies->cookie_list;
     while (cookie != NULL) {

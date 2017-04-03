@@ -15,14 +15,14 @@
 int download(char *url, char *saveto); 
 void usage(char *prog);
 
-struct cookies cookies;
+struct cookie_jar_s cookies;
 
 
 
 int main(int argc, char **argv) {
     char *url = NULL;
     char buf[MAX_COOKIE_LEN];
-    memset(&cookies, 0, sizeof(struct cookies));
+    memset(&cookies, 0, sizeof(struct cookie_jar_s));
     int index = 1;
     char c;
     
